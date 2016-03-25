@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">CdR</string>
+
+    <string-array name="gradeChoices">
+        <item>EXC</item>
+        <item>BOM</item>
+        <item>REG</item>
+        <item>INS</item>
+    </string-array>
+</resources>
