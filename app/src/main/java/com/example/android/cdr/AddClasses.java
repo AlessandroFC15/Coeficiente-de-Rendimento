@@ -1,5 +1,6 @@
 package com.example.android.cdr;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -7,10 +8,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -23,8 +23,9 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     private HashMap<String, ArrayList> classes = new HashMap<>();
 
     // Constants
-    private static final int GRADE_INDEX = 0;
-    private static final int WORKLOAD_INDEX = 1;
+    public static final int GRADE_INDEX = 0;
+    public static final int WORKLOAD_INDEX = 1;
+    public static final int SEMESTER_INDEX = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,70 +77,77 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
             {
                 if (workloadHours != 0)
                 {
-                    double nota = gradeToNota(grade);
+                    int semester = getSemester();
 
-                    ArrayList<Double> values = new ArrayList<>(2);
+                    if (semester > 0)
+                    {
+                        double nota = gradeToNota(grade);
 
-                    values.add(GRADE_INDEX, nota);
-                    values.add(WORKLOAD_INDEX, (double) workloadHours);
+                        ArrayList<Double> values = new ArrayList<>(3);
 
-                    classes.put(nameOfClass, values);
+                        values.add(GRADE_INDEX, nota);
+                        values.add(WORKLOAD_INDEX, (double) workloadHours);
+                        values.add(SEMESTER_INDEX, (double) semester);
 
-                    makeToast(nameOfClass + " succesfully added!");
+                        classes.put(nameOfClass, values);
 
-                    printClass(nameOfClass);
-                    return;
+                        makeToast(nameOfClass + " succesfully added!");
+
+                        cleanInputField();
+                    }
                 } else
                 {
                     makeToast("Select a workload");
                 }
             } else
             {
-                makeToast("The class " + nameOfClass + " is already registered!" );
+                makeToast("The class " + nameOfClass + " is already registered!");
             }
         }
     }
 
-    private void printClass(String nameOfClass)
+    private int getSemester()
     {
-        TextView newClass = new TextView(this);
+        EditText editText = (EditText) findViewById(R.id.semester);
 
-        newClass.setTextSize(20);
-        newClass.setPadding(16, 16, 16, 16);
+        // The function trim is used to exclude any additional whitespace.
+        String input  = editText.getText().toString().trim();
 
-        String text = nameOfClass + " | " + getGrade(nameOfClass) + " | " + getWorkload(nameOfClass);
-
-        newClass.setText(text);
-
-        LinearLayout layout = (LinearLayout) findViewById(R.id.main_content);
-        layout.addView(newClass);
-    }
-
-    private double getWorkload(String nameOfClass)
-    {
-        // Check to see if that class is registered
-        if (classes.containsKey((nameOfClass)))
+        if (TextUtils.isEmpty(input))
         {
-            return (double) classes.get(nameOfClass).get(WORKLOAD_INDEX);
+            editText.setError("Enter a valid semester!");
+            return -1;
         } else
         {
-            makeToast(nameOfClass + "is not registered in the system!");
-            return -1;
-        }
 
+            try {
+                int value = Integer.parseInt(input);
+
+                if (value <= 0)
+                {
+                    editText.setError("Semester must be greater than 0");
+                    return -1;
+                }
+
+                return value;
+            } catch (NumberFormatException e) {
+                editText.setError("Enter a valid semester!");
+                return -1;
+            }
+        }
     }
 
-    private double getGrade(String nameOfClass)
+    private void cleanInputField()
     {
-        // Check to see if that class is registered
-        if (classes.containsKey((nameOfClass)))
-        {
-            return (double) classes.get(nameOfClass).get(GRADE_INDEX);
-        } else
-        {
-            makeToast(nameOfClass + "is not registered in the system!");
-            return -1;
-        }
+        EditText input = (EditText) findViewById(R.id.nameOfClass);
+        input.setText("");
+
+        RadioGroup workloadInput = (RadioGroup) findViewById(R.id.workloadID);
+
+        workloadInput.clearCheck();
+
+        EditText semester = (EditText) findViewById(R.id.semester);
+        semester.setText("");
     }
 
     private String getNameOfClass()
@@ -206,6 +214,15 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                     break;
                 }
         }
+    }
+
+    public void changeActivity(View view)
+    {
+        Intent intent = new Intent(this, ShowClasses.class);
+
+        intent.putExtra("Classes", classes);
+
+        startActivity(intent);
     }
 
 
