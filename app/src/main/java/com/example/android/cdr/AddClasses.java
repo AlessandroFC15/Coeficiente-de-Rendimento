@@ -7,14 +7,24 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class AddClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private int workloadHours = 0;
     private String grade = "EXC";
+    private HashMap<String, ArrayList> classes = new HashMap<>();
+
+    // Constants
+    private static final int GRADE_INDEX = 0;
+    private static final int WORKLOAD_INDEX = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,18 +68,77 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     {
         String nameOfClass = getNameOfClass();
 
+        // Check to see if the name inputted is a valid name
         if (nameOfClass != "")
         {
-            if (workloadHours != 0)
+            // Check to see if the class isn't already registered
+            if (!classes.containsKey(nameOfClass))
             {
-                makeToast(nameOfClass + " succesfully added!");
-                return;
+                if (workloadHours != 0)
+                {
+                    double nota = gradeToNota(grade);
+
+                    ArrayList<Double> values = new ArrayList<>(2);
+
+                    values.add(GRADE_INDEX, nota);
+                    values.add(WORKLOAD_INDEX, (double) workloadHours);
+
+                    classes.put(nameOfClass, values);
+
+                    makeToast(nameOfClass + " succesfully added!");
+
+                    printClass(nameOfClass);
+                    return;
+                } else
+                {
+                    makeToast("Select a workload");
+                }
             } else
             {
-                makeToast("Select a workload");
+                makeToast("The class " + nameOfClass + " is already registered!" );
             }
+        }
+    }
 
-            return;
+    private void printClass(String nameOfClass)
+    {
+        TextView newClass = new TextView(this);
+
+        newClass.setTextSize(20);
+        newClass.setPadding(16, 16, 16, 16);
+
+        String text = nameOfClass + " | " + getGrade(nameOfClass) + " | " + getWorkload(nameOfClass);
+
+        newClass.setText(text);
+
+        LinearLayout layout = (LinearLayout) findViewById(R.id.main_content);
+        layout.addView(newClass);
+    }
+
+    private double getWorkload(String nameOfClass)
+    {
+        // Check to see if that class is registered
+        if (classes.containsKey((nameOfClass)))
+        {
+            return (double) classes.get(nameOfClass).get(WORKLOAD_INDEX);
+        } else
+        {
+            makeToast(nameOfClass + "is not registered in the system!");
+            return -1;
+        }
+
+    }
+
+    private double getGrade(String nameOfClass)
+    {
+        // Check to see if that class is registered
+        if (classes.containsKey((nameOfClass)))
+        {
+            return (double) classes.get(nameOfClass).get(GRADE_INDEX);
+        } else
+        {
+            makeToast(nameOfClass + "is not registered in the system!");
+            return -1;
         }
     }
 
@@ -98,6 +167,23 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         toast.show();
     }
 
+    private double gradeToNota(String grade)
+    {
+        switch (grade)
+        {
+            case "EXC":
+                return 10;
+            case "BOM":
+                return 7.5;
+            case "REG":
+                return 5;
+            case "INS":
+                return 0;
+            default:
+                return 0;
+        }
+    }
+
     // Function related to the radio buttons.
 
     public void selectWorkload(View view)
@@ -121,5 +207,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 }
         }
     }
+
+
 }
 
