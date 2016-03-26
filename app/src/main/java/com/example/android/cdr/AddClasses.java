@@ -15,13 +15,14 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public class AddClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private int workloadHours = 0;
     private String grade = "EXC";
     private HashMap<String, ArrayList> classes = new HashMap<>();
-    //private Set<Integer> allSemesters = new HashSet<Integer>();
+    private TreeSet<Integer> allSemesters = new TreeSet<>();
     private int totalWorkload = 0;
     private double totalPoints = 0;
 
@@ -82,7 +83,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 {
                     int semester = getSemester();
 
-                    addNewSemester(semester);
+                    allSemesters.add(semester);
 
                     if (semester > 0)
                     {
@@ -113,11 +114,6 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 makeToast("The class " + nameOfClass + " is already registered!");
             }
         }
-    }
-
-    private void addNewSemester(int semester)
-    {
-        
     }
 
     private int getSemester()
@@ -237,6 +233,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         intent.putExtra("Classes", classes);
 
         intent.putExtra("CDR", totalPoints/totalWorkload);
+
+        intent.putExtra("Semesters", allSemesters);
 
         startActivity(intent);
     }
