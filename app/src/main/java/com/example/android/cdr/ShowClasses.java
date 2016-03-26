@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,10 +16,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
-public class ShowClasses extends AppCompatActivity {
+public class ShowClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
+
+    // Constants
+    private static final int NONE = 0;
+    private static final int ALL_SEMESTERS = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,39 +36,71 @@ public class ShowClasses extends AppCompatActivity {
 
         allSemesters = (TreeSet) intent.getSerializableExtra("Semesters");
 
-        printClasses();
-    }
+        setSpinner();
 
-    private void printClasses()
-    {
-        if (classes.isEmpty())
-        {
+        if (classes.isEmpty()) {
             printWarning();
-        } else
-        {
-            LinearLayout mainLayout = (LinearLayout) findViewById(R.id.showClassesMain);
-
-            for (int semester : allSemesters)
-            {
-                printAllClassesInSemester(semester, mainLayout);
-            }
-
-            /*
-            for (String nameOfClass : classes.keySet())
-            {
-                TextView textView = new TextView(this);
-
-                String text = nameOfClass + " | " + getGrade(nameOfClass) + " | " +
-                        getWorkload(nameOfClass) + " | " + getSemester(nameOfClass);
-
-                textView.setText(text);
-                textView.setTextSize(16);
-
-                mainLayout.addView(textView);
-            }*/
-
+        } else {
+            printAllClasses();
             printCdR();
         }
+    }
+
+    // Methods related to the spinner
+
+    private void setSpinner()
+    {
+        Spinner spinner = (Spinner) findViewById(R.id.semesterSpinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.semesterChoices, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(this);
+    }
+
+    public void onItemSelected(AdapterView<?> parent, View view,
+                               int pos, long id) {
+        // An item was selected. You can retrieve the selected item using
+        // parent.getItemAtPosition(pos)
+        String choice = parent.getItemAtPosition(pos).toString();
+
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.classesLayout);
+
+        if (choice.equals("All Semesters"))
+        {
+            mainLayout.removeAllViews();
+            printAllClasses();
+        } else if (choice.equals("None"))
+        {
+            mainLayout.removeAllViews();
+        }
+    }
+
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+
+    }
+
+    private void printAllClasses()
+    {
+        showSpinner();
+
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.classesLayout);
+
+        for (int semester : allSemesters)
+        {
+            printAllClassesInSemester(semester, mainLayout);
+        }
+    }
+
+    private void showSpinner()
+    {
+        LinearLayout spinnerGroup = (LinearLayout) findViewById(R.id.semesterSpinnerGroup);
+        spinnerGroup.setVisibility(View.VISIBLE);
     }
 
     private void printAllClassesInSemester(int semester, LinearLayout layout)
@@ -123,7 +163,8 @@ public class ShowClasses extends AppCompatActivity {
 
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.showClassesMain);
 
-        mainLayout.addView(warning);
+        // Add the warning just after the heading.
+        mainLayout.addView(warning, 1);
     }
 
     private int getWorkload(String nameOfClass)

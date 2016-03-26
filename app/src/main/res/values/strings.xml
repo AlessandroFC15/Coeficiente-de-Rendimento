@@ -7,4 +7,9 @@
         <item>REG</item>
         <item>INS</item>
     </string-array>
+
+    <string-array name="semesterChoices">
+        <item>All Semesters</item>
+        <item>None</item>
+    </string-array>
 </resources>
