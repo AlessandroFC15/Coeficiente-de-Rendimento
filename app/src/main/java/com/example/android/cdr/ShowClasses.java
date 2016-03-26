@@ -10,10 +10,12 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeSet;
 
 public class ShowClasses extends AppCompatActivity {
 
     private HashMap<String, ArrayList> classes = new HashMap<>();
+    private TreeSet<Integer> allSemesters = new TreeSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +25,8 @@ public class ShowClasses extends AppCompatActivity {
         Intent intent = getIntent();
 
         classes = (HashMap) intent.getSerializableExtra("Classes");
+
+        allSemesters = (TreeSet) intent.getSerializableExtra("Semesters");
 
         printClasses();
     }
@@ -34,6 +38,14 @@ public class ShowClasses extends AppCompatActivity {
             printWarning();
         } else
         {
+            LinearLayout mainLayout = (LinearLayout) findViewById(R.id.showClassesMain);
+
+            for (int semester : allSemesters)
+            {
+                printAllClassesInSemester(semester, mainLayout);
+            }
+
+            /*
             for (String nameOfClass : classes.keySet())
             {
                 TextView textView = new TextView(this);
@@ -44,15 +56,44 @@ public class ShowClasses extends AppCompatActivity {
                 textView.setText(text);
                 textView.setTextSize(16);
 
-                //layout.addView(textView);
-
-                LinearLayout mainLayout = (LinearLayout) findViewById(R.id.showClassesMain);
-
                 mainLayout.addView(textView);
-            }
+            }*/
 
             printCdR();
         }
+    }
+
+    private void printAllClassesInSemester(int semester, LinearLayout layout)
+    {
+        TextView heading = new TextView(this);
+
+        heading.setGravity(Gravity.CENTER_HORIZONTAL);
+        heading.setText("SEMESTER " + Integer.toString(semester));
+        heading.setTextSize(26);
+        heading.setPadding(16,16,16,16);
+
+        layout.addView(heading);
+
+        for (String nameOfClass : classes.keySet())
+        {
+            if (getSemester(nameOfClass) == semester)
+            {
+                printSingleClass(nameOfClass, layout);
+            }
+        }
+    }
+
+    private void printSingleClass(String nameOfClass, LinearLayout layout)
+    {
+        TextView textView = new TextView(this);
+
+        String text = nameOfClass + " | " + getGrade(nameOfClass) + " | " +
+                getWorkload(nameOfClass);
+
+        textView.setText(text);
+        textView.setTextSize(16);
+
+        layout.addView(textView);
     }
 
     private void printCdR()
