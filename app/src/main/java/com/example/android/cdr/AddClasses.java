@@ -21,6 +21,9 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     private int workloadHours = 0;
     private String grade = "EXC";
     private HashMap<String, ArrayList> classes = new HashMap<>();
+    //private Set<Integer> allSemesters = new HashSet<Integer>();
+    private int totalWorkload = 0;
+    private double totalPoints = 0;
 
     // Constants
     public static final int GRADE_INDEX = 0;
@@ -79,6 +82,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 {
                     int semester = getSemester();
 
+                    addNewSemester(semester);
+
                     if (semester > 0)
                     {
                         double nota = gradeToNota(grade);
@@ -91,9 +96,13 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
 
                         classes.put(nameOfClass, values);
 
-                        makeToast(nameOfClass + " succesfully added!");
-
                         cleanInputField();
+
+                        totalWorkload += workloadHours;
+
+                        totalPoints += (nota * workloadHours);
+
+                        makeToast(nameOfClass + " succesfully added!");
                     }
                 } else
                 {
@@ -104,6 +113,11 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 makeToast("The class " + nameOfClass + " is already registered!");
             }
         }
+    }
+
+    private void addNewSemester(int semester)
+    {
+        
     }
 
     private int getSemester()
@@ -221,6 +235,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         Intent intent = new Intent(this, ShowClasses.class);
 
         intent.putExtra("Classes", classes);
+
+        intent.putExtra("CDR", totalPoints/totalWorkload);
 
         startActivity(intent);
     }

@@ -3,6 +3,7 @@ package com.example.android.cdr;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Gravity;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +50,27 @@ public class ShowClasses extends AppCompatActivity {
 
                 mainLayout.addView(textView);
             }
+
+            printCdR();
         }
+    }
+
+    private void printCdR()
+    {
+        Intent intent = getIntent();
+
+        Double cdr = intent.getDoubleExtra("CDR", 0);
+
+        TextView textView = new TextView(this);
+
+        textView.setText("Coeficiente de Rendimento\n" + cdr.toString());
+        textView.setTextSize(20);
+        textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        textView.setPadding(16,16,16,16);
+
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.showClassesMain);
+
+        mainLayout.addView(textView);
     }
 
     private void printWarning()
