@@ -20,6 +20,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
+    ArrayList<String> choicesForSemesters = new ArrayList<>();
 
     // Constants
     private static final int NONE = 0;
@@ -50,16 +51,31 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private void setSpinner()
     {
+        setChoicesForShowOfSemesters();
+
         Spinner spinner = (Spinner) findViewById(R.id.semesterSpinner);
         // Create an ArrayAdapter using the string array and a default spinner layout
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.semesterChoices, android.R.layout.simple_spinner_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, choicesForSemesters);
+
         // Specify the layout to use when the list of choices appears
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
 
         spinner.setOnItemSelectedListener(this);
+    }
+
+    private void setChoicesForShowOfSemesters()
+    {
+        // Default choices
+        choicesForSemesters.add("All Semesters");
+        choicesForSemesters.add("None");
+
+        for (int semester : allSemesters)
+        {
+            choicesForSemesters.add("Semester " + Integer.toString(semester));
+        }
     }
 
     public void onItemSelected(AdapterView<?> parent, View view,
