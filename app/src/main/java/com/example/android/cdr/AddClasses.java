@@ -30,6 +30,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     public static final int GRADE_INDEX = 0;
     public static final int WORKLOAD_INDEX = 1;
     public static final int SEMESTER_INDEX = 2;
+    private static final int MAX_SEMESTER = 16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,9 +134,9 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
             try {
                 int value = Integer.parseInt(input);
 
-                if (value <= 0)
+                if (value <= 0 || value > MAX_SEMESTER)
                 {
-                    editText.setError("Semester must be greater than 0");
+                    editText.setError("Semester must be between 0 and " + Integer.toString(MAX_SEMESTER));
                     return -1;
                 }
 

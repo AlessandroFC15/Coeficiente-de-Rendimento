@@ -109,7 +109,7 @@
         android:layout_marginTop="50dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Change Activity"
+        android:text="Show Classes"
         android:layout_gravity="center_horizontal"
         android:onClick="changeActivity" />
 </LinearLayout>
