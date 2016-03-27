@@ -131,7 +131,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
                 getWorkload(nameOfClass);
 
         textView.setText(text);
-        textView.setTextSize(16);
+        textView.setTextSize(15);
 
         layout.addView(textView);
     }
