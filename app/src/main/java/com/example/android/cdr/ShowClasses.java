@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
@@ -143,34 +142,33 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         // Creation of the row that will hold the class
         TableRow wholeClass = new TableRow(this);
 
-        // Creating LayoutParams to implement the correct weight
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                0, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.weight = 2;
+        // Creating LayoutParams to implement the correct width
+        //TableRow.LayoutParams params = new TableRow.LayoutParams(180,
+        //        ViewGroup.LayoutParams.WRAP_CONTENT);
 
         // Add of nameOfClass cell
         TextView nameOfClass = new TextView(this);
         nameOfClass.setText(name);
-        nameOfClass.setTextSize(15);
-        //nameOfClass.setLayoutParams(params);
+        nameOfClass.setTextSize(16);
+        nameOfClass.setWidth(180);
 
-        wholeClass.addView(nameOfClass);
-
-        // Changing weight to 1 for the other 2 cells
-        params.weight = 1;
+        // Changing width to 80 for the other 2 cells
+        //params.width = 80;
 
         // Add of grade cell
         TextView grade = new TextView(this);
-        grade.setText(Double.toString(getGrade(name)));
-        //grade.setLayoutParams(params);
-
-        wholeClass.addView(grade);
+        grade.setText(getGradeString(name));
+        grade.setTextSize(16);
+        grade.setWidth(80);
 
         // Add of workload cell
         TextView workload = new TextView(this);
         workload.setText(Integer.toString(getWorkload(name)));
-        //workload.setLayoutParams(params);
+        workload.setTextSize(16);
+        workload.setWidth(80);
 
+        wholeClass.addView(nameOfClass);
+        wholeClass.addView(grade);
         wholeClass.addView(workload);
 
         // Adding the row to the table
@@ -239,6 +237,35 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         } else {
             makeToast(nameOfClass + "is not registered in the system!");
             return -1;
+        }
+    }
+
+    private String getGradeString(String nameOfClass)
+    {
+        double grade = getGrade(nameOfClass);
+
+        if (grade != -1)
+        {
+            if (grade == 10)
+            {
+                return "EXC";
+            } else if (grade == 7.5)
+            {
+                return "BOM";
+            } else if (grade == 5)
+            {
+                return "REG";
+            } else if (grade == 0)
+            {
+                return "INS";
+            } else
+            {
+                makeToast("Problem grade to string conversion!");
+                return null;
+            }
+        } else
+        {
+            return null;
         }
     }
 
