@@ -45,8 +45,7 @@
         android:id="@+id/wholeTable"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:weightSum="4">
+        android:padding="10dp">
 
         <TableRow>
             <TextView
@@ -54,30 +53,27 @@
                 android:textSize="16dp"
                 android:textColor="#000000"
                 android:layout_height="wrap_content"
-                android:layout_width="0dp"
-                android:layout_weight="2"/>
+                android:layout_width="180dp"/>
 
             <TextView
                 android:text="Conceito"
                 android:textSize="16dp"
                 android:textColor="#000000"
-                android:layout_width="0dp"
-                android:layout_weight="1"/>
+                android:layout_width="80dp"
+                />
 
             <TextView
                 android:text="Workload"
                 android:textSize="16dp"
                 android:textColor="#000000"
-                android:layout_width="0dp"
-                android:layout_weight="1"/>
+                android:layout_width="80dp"
+                />
         </TableRow>
 
         <TableLayout
             android:id="@+id/classesTable"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="4">
-
+            android:layout_height="wrap_content">
         </TableLayout>
 
 
