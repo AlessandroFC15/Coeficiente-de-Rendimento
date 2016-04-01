@@ -3,6 +3,7 @@ package com.example.android.cdr;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -128,44 +129,68 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         }
     }
 
+    /*
+     * The method below will print all classes in a given semester, followed by the CdR of that
+     * particular semester
+     */
     private void printAllClassesInSemester(int semester) {
         TableLayout table = (TableLayout) findViewById(R.id.classesTable);
 
+        double totalPoints = 0, totalWorkload = 0;
+
         for (String nameOfClass : classes.keySet()) {
             if (getSemester(nameOfClass) == semester) {
+
+                int workload = getWorkload(nameOfClass);
+
+                totalPoints += workload * getGrade(nameOfClass);
+
+                totalWorkload += workload;
+
                 printSingleClass(nameOfClass, table);
             }
         }
+
+        double cdr = totalPoints/totalWorkload;
+
+        printSemesterCdR(cdr, semester);
+    }
+
+    private void printSemesterCdR(double cdr, int semester)
+    {
+        TextView textView = new TextView(this);
+
+        textView.setText("CdR (" + Integer.toString(semester) + "º Semestre) = " + Double.toString(cdr));
+        textView.setTextSize(18);
+        textView.setGravity(Gravity.CENTER_HORIZONTAL);
+        textView.setPadding(16, 16, 16, 16);
+
+        TableLayout table = (TableLayout) findViewById(R.id.classesTable);
+
+        table.addView(textView);
     }
 
     private void printSingleClass(String name, TableLayout table) {
         // Creation of the row that will hold the class
         TableRow wholeClass = new TableRow(this);
 
-        // Creating LayoutParams to implement the correct width
-        //TableRow.LayoutParams params = new TableRow.LayoutParams(180,
-        //        ViewGroup.LayoutParams.WRAP_CONTENT);
-
         // Add of nameOfClass cell
         TextView nameOfClass = new TextView(this);
         nameOfClass.setText(name);
         nameOfClass.setTextSize(16);
-        nameOfClass.setWidth(180);
-
-        // Changing width to 80 for the other 2 cells
-        //params.width = 80;
+        nameOfClass.setWidth(getPixels(160));
 
         // Add of grade cell
         TextView grade = new TextView(this);
         grade.setText(getGradeString(name));
         grade.setTextSize(16);
-        grade.setWidth(80);
+        grade.setWidth(getPixels(80));
 
         // Add of workload cell
         TextView workload = new TextView(this);
         workload.setText(Integer.toString(getWorkload(name)));
         workload.setTextSize(16);
-        workload.setWidth(80);
+        workload.setWidth(getPixels(80));
 
         wholeClass.addView(nameOfClass);
         wholeClass.addView(grade);
@@ -185,7 +210,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         TextView textView = new TextView(this);
 
         textView.setText("Coeficiente de Rendimento\n" + cdr.toString());
-        textView.setTextSize(20);
+        textView.setTextSize(22);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setPadding(16, 16, 16, 16);
 
@@ -283,5 +308,10 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     public void makeToast(String text) {
         Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
         toast.show();
+    }
+
+    private int getPixels(int dp)
+    {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, getResources().getDisplayMetrics());
     }
 }
