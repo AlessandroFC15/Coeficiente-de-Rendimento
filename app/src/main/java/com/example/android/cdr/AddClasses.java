@@ -98,17 +98,17 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
 
                         classes.put(nameOfClass, values);
 
-                        cleanInputField();
-
                         totalWorkload += workloadHours;
 
                         totalPoints += (nota * workloadHours);
 
                         makeToast(nameOfClass + " succesfully added!");
+
+                        cleanInputField();
                     }
                 } else
                 {
-                    makeToast("Select a workload");
+                    makeToast("Select a workload!");
                 }
             } else
             {
@@ -156,6 +156,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         RadioGroup workloadInput = (RadioGroup) findViewById(R.id.workloadID);
 
         workloadInput.clearCheck();
+        workloadHours = 0;
 
         EditText semester = (EditText) findViewById(R.id.semester);
         semester.setText("");
