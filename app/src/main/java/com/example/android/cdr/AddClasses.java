@@ -19,10 +19,12 @@ import java.util.TreeSet;
 
 public class AddClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private int workloadHours = 0;
-    private String grade = "EXC";
     private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
+
+    private int workloadHours = 0;
+    private String grade = "EXC";
+
     private int totalWorkload = 0;
     private double totalPoints = 0;
 
@@ -70,6 +72,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         grade = "EXC";
     }
 
+    // End of methods related to the spinner
+
     public void addClass(View view)
     {
         String nameOfClass = getNameOfClass();
@@ -84,10 +88,10 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                 {
                     int semester = getSemester();
 
-                    allSemesters.add(semester);
-
                     if (semester > 0)
                     {
+                        allSemesters.add(semester);
+
                         double nota = gradeToNota(grade);
 
                         ArrayList<Double> values = new ArrayList<>(3);
@@ -117,6 +121,25 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         }
     }
 
+    // Helper Functions
+
+    private String getNameOfClass()
+    {
+        EditText input = (EditText) findViewById(R.id.nameOfClass);
+
+        // The function trim is used to exclude any additional whitespace.
+        String name = input.getText().toString().trim();
+
+        if (TextUtils.isEmpty(name))
+        {
+            input.setError("Text must not be empty!");
+            return "";
+        } else
+        {
+            return name;
+        }
+    }
+
     private int getSemester()
     {
         EditText editText = (EditText) findViewById(R.id.semester);
@@ -130,13 +153,12 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
             return -1;
         } else
         {
-
             try {
                 int value = Integer.parseInt(input);
 
                 if (value <= 0 || value > MAX_SEMESTER)
                 {
-                    editText.setError("Semester must be between 0 and " + Integer.toString(MAX_SEMESTER));
+                    editText.setError("Semester must be between 1 and " + Integer.toString(MAX_SEMESTER));
                     return -1;
                 }
 
@@ -154,29 +176,11 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         input.setText("");
 
         RadioGroup workloadInput = (RadioGroup) findViewById(R.id.workloadID);
-
         workloadInput.clearCheck();
         workloadHours = 0;
 
         EditText semester = (EditText) findViewById(R.id.semester);
         semester.setText("");
-    }
-
-    private String getNameOfClass()
-    {
-        EditText input = (EditText) findViewById(R.id.nameOfClass);
-
-        // The function trim is used to exclude any additional whitespace.
-        String name = input.getText().toString().trim();
-
-        if (TextUtils.isEmpty(name))
-        {
-            input.setError("Text must not be empty!");
-            return "";
-        } else
-        {
-            return name;
-        }
     }
 
     // Helper function
@@ -240,7 +244,5 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
 
         startActivity(intent);
     }
-
-
 }
 
