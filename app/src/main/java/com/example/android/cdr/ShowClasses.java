@@ -33,6 +33,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_classes);
+        setTitle("Classes Registered");
 
         Intent intent = getIntent();
 
@@ -104,6 +105,11 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         }
     }
 
+    public void onNothingSelected(AdapterView<?> parent) {
+        // Another interface callback
+
+    }
+
     private int getChoiceOfSemester(String choice) {
         // Get the last 2 chars, given the range that a semester can be (1,16)
         String number = choice.substring(choice.length() - 2).trim();
@@ -114,11 +120,6 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
             makeToast("Sorry, we encountered an error!");
             return -1;
         }
-    }
-
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Another interface callback
-
     }
 
     private void printAllClasses() {
@@ -209,7 +210,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
         TextView textView = new TextView(this);
 
-        textView.setText("Coeficiente de Rendimento\n" + cdr.toString());
+        // textView.setText("Coeficiente de Rendimento\n" + cdr.toString());
+        textView.setText(String.format( "Coeficiente de Rendimento\n%.2f", cdr));
         textView.setTextSize(22);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);
         textView.setPadding(16, 16, 16, 16);
