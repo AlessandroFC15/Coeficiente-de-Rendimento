@@ -13,13 +13,9 @@ import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeSet;
 
 public class AddClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-
-    private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
 
     private ClassesData classesDB;
@@ -87,7 +83,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         if (nameOfClass != "")
         {
             // Check to see if the class isn't already registered
-            if (!classes.containsKey(nameOfClass))
+            if (!classesDB.isClassRegistered(nameOfClass))
             {
                 if (workloadHours != 0)
                 {
@@ -98,14 +94,6 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                         allSemesters.add(semester);
 
                         double nota = gradeToNota(grade);
-
-                        ArrayList<Double> values = new ArrayList<>(3);
-
-                        values.add(GRADE_INDEX, nota);
-                        values.add(WORKLOAD_INDEX, (double) workloadHours);
-                        values.add(SEMESTER_INDEX, (double) semester);
-
-                        classes.put(nameOfClass, values);
 
                         classesDB.addClass(nameOfClass, semester, workloadHours, nota);
 
@@ -242,9 +230,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     public void changeActivity(View view)
     {
         Intent intent = new Intent(this, ShowClasses.class);
-
-        intent.putExtra("Classes", classes);
-
+        
         intent.putExtra("CDR", totalPoints/totalWorkload);
 
         intent.putExtra("Semesters", allSemesters);

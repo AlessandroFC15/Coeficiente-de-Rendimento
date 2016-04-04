@@ -56,8 +56,7 @@ public class ClassesData extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public void addClass(String nameOfClass, int semester, int workload, double grade)
-    {
+    public void addClass(String nameOfClass, int semester, int workload, double grade) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         // Create a new map of values, where column names are the keys
@@ -71,8 +70,7 @@ public class ClassesData extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, "null", values);
     }
 
-    public ArrayList<String> getAllNamesOfClasses()
-    {
+    public ArrayList<String> getAllNamesOfClasses() {
         SQLiteDatabase db = this.getReadableDatabase();
 
         String[] projection = {
@@ -107,4 +105,24 @@ public class ClassesData extends SQLiteOpenHelper {
 
         return allNames;
     }
+
+    public boolean isTableEmpty() {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_NAME, null);
+        if (cursor != null) {
+            cursor.moveToFirst();                       // Always one row returned.
+            return cursor.getInt(0) == 0;              // Zero count means empty table.
+        }
+
+        return true;
+    }
+
+    public boolean isClassRegistered(String nameOfClass)
+    {
+        ArrayList<String> allNameOfClasses = getAllNamesOfClasses();
+
+        return allNameOfClasses.indexOf(nameOfClass) != -1;
+    }
 }
+

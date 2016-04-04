@@ -16,12 +16,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeSet;
 
 public class ShowClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-    private HashMap<String, ArrayList> classes = new HashMap<>();
+    // private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
     ArrayList<String> choicesForSemesters = new ArrayList<>();
 
@@ -42,13 +41,13 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
         Intent intent = getIntent();
 
-        classes = (HashMap) intent.getSerializableExtra("Classes");
+        // classes = (HashMap) intent.getSerializableExtra("Classes");
 
         allSemesters = (TreeSet) intent.getSerializableExtra("Semesters");
 
         setSpinner();
 
-        if (classes.isEmpty()) {
+        if (classesDB.isTableEmpty()) {
             printWarning();
         } else {
             printAllClasses();
@@ -144,7 +143,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
         double totalPoints = 0, totalWorkload = 0;
 
-        for (String nameOfClass : classes.keySet()) {
+        for (String nameOfClass : classesDB.getAllNamesOfClasses()) {
             if (getSemester(nameOfClass) == semester) {
 
                 int workload = getWorkload(nameOfClass);
@@ -186,7 +185,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         nameOfClass.setTextSize(16);
         nameOfClass.setWidth(getPixels(160));
 
-        /*
+
         // Add of grade cell
         TextView grade = new TextView(this);
         grade.setText(getGradeString(name));
@@ -198,11 +197,11 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         workload.setText(Integer.toString(getWorkload(name)));
         workload.setTextSize(16);
         workload.setWidth(getPixels(80));
-        */
+
 
         wholeClass.addView(nameOfClass);
-        //wholeClass.addView(grade);
-        //wholeClass.addView(workload);
+        wholeClass.addView(grade);
+        wholeClass.addView(workload);
 
         // Adding the row to the table
         TableLayout layout = (TableLayout) findViewById(R.id.classesTable);
@@ -255,9 +254,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private int getWorkload(String nameOfClass) {
         // Check to see if that class is registered
-        if (classes.containsKey((nameOfClass))) {
-            Double value = (Double) classes.get(nameOfClass).get(AddClasses.WORKLOAD_INDEX);
-            return value.intValue();
+        if (classesDB.isClassRegistered(nameOfClass)) {
+            return 68;
         } else {
             makeToast(nameOfClass + "is not registered in the system!");
             return -1;
@@ -266,8 +264,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private double getGrade(String nameOfClass) {
         // Check to see if that class is registered
-        if (classes.containsKey((nameOfClass))) {
-            return (double) classes.get(nameOfClass).get(AddClasses.GRADE_INDEX);
+        if (classesDB.isClassRegistered(nameOfClass)) {
+            return 10.0;
         } else {
             makeToast(nameOfClass + "is not registered in the system!");
             return -1;
@@ -305,9 +303,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private int getSemester(String nameOfClass) {
         // Check to see if that class is registered
-        if (classes.containsKey((nameOfClass))) {
-            Double semester = (Double) classes.get(nameOfClass).get(AddClasses.SEMESTER_INDEX);
-            return semester.intValue();
+        if (classesDB.isClassRegistered(nameOfClass)) {
+            return 1;
         } else {
             makeToast(nameOfClass + "is not registered in the system!");
             return -1;
