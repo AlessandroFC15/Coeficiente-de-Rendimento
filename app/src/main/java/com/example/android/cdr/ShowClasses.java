@@ -25,6 +25,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     private TreeSet<Integer> allSemesters = new TreeSet<>();
     ArrayList<String> choicesForSemesters = new ArrayList<>();
 
+    private ClassesData classesDB;
+
     // Constants
     private static final int NONE = 0;
     private static final int ALL_SEMESTERS = 1;
@@ -34,6 +36,9 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_classes);
         setTitle("Classes Registered");
+
+        // Initiate database
+        classesDB = new ClassesData(this);
 
         Intent intent = getIntent();
 
@@ -125,7 +130,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     private void printAllClasses() {
         TableLayout mainLayout = (TableLayout) findViewById(R.id.classesTable);
 
-        for (String nameOfClass : classes.keySet()) {
+        for (String nameOfClass : classesDB.getAllNamesOfClasses()) {
             printSingleClass(nameOfClass, mainLayout);
         }
     }
@@ -181,6 +186,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         nameOfClass.setTextSize(16);
         nameOfClass.setWidth(getPixels(160));
 
+        /*
         // Add of grade cell
         TextView grade = new TextView(this);
         grade.setText(getGradeString(name));
@@ -192,10 +198,11 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         workload.setText(Integer.toString(getWorkload(name)));
         workload.setTextSize(16);
         workload.setWidth(getPixels(80));
+        */
 
         wholeClass.addView(nameOfClass);
-        wholeClass.addView(grade);
-        wholeClass.addView(workload);
+        //wholeClass.addView(grade);
+        //wholeClass.addView(workload);
 
         // Adding the row to the table
         TableLayout layout = (TableLayout) findViewById(R.id.classesTable);

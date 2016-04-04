@@ -22,6 +22,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
     private HashMap<String, ArrayList> classes = new HashMap<>();
     private TreeSet<Integer> allSemesters = new TreeSet<>();
 
+    private ClassesData classesDB;
+
     private int workloadHours = 0;
     private String grade = "EXC";
 
@@ -40,6 +42,9 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         setContentView(R.layout.activity_add_classes);
 
         setSpinner();
+
+        // Initiate database
+        classesDB = new ClassesData(this);
     }
 
     // Methods related to the spinner
@@ -101,6 +106,8 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                         values.add(SEMESTER_INDEX, (double) semester);
 
                         classes.put(nameOfClass, values);
+
+                        classesDB.addClass(nameOfClass, semester, workloadHours, nota);
 
                         totalWorkload += workloadHours;
 
