@@ -26,10 +26,6 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
     private ClassesData classesDB;
 
-    // Constants
-    private static final int NONE = 0;
-    private static final int ALL_SEMESTERS = 1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +43,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
         setSpinner();
 
-        if (classesDB.isTableEmpty()) {
+        if (classesDB.isClassesTableEmpty()) {
             printWarning();
         } else {
             printAllClasses();
@@ -184,7 +180,6 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         nameOfClass.setText(name);
         nameOfClass.setTextSize(16);
         nameOfClass.setWidth(getPixels(160));
-
 
         // Add of grade cell
         TextView grade = new TextView(this);
