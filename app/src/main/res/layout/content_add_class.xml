@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -9,7 +9,9 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".AddClasses">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.android.cdr.AddClass"
+    tools:showIn="@layout/app_bar_add_class">
 
     <TextView
         android:layout_width="match_parent"
@@ -102,14 +104,8 @@
         android:layout_gravity="center_horizontal"
         android:onClick="addClass"
         android:padding="16dp"
+        android:layout_marginTop="15dp"
+        android:textColor="@color/colorPrimaryDark"
         android:text="Add Class"
         android:textSize="18sp" />
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="50dp"
-        android:onClick="changeActivity"
-        android:text="Show Classes" />
 </LinearLayout>

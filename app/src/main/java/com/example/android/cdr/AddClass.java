@@ -2,8 +2,15 @@ package com.example.android.cdr;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -15,33 +22,97 @@ import android.widget.Toast;
 
 import java.util.TreeSet;
 
-public class AddClasses extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
-    private TreeSet<Integer> allSemesters = new TreeSet<>();
+public class AddClass extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, AdapterView.OnItemSelectedListener {
 
     private ClassesData classesDB;
-
-    private int workloadHours = 0;
-    private String grade = "EXC";
-
-    private int totalWorkload = 0;
-    private double totalPoints = 0;
-
-    // Constants
-    public static final int GRADE_INDEX = 0;
-    public static final int WORKLOAD_INDEX = 1;
-    public static final int SEMESTER_INDEX = 2;
-    private static final int MAX_SEMESTER = 16;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_classes);
+        setContentView(R.layout.activity_add_class);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         setSpinner();
 
         // Initiate database
         classesDB = new ClassesData(this);
     }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.add_class, menu);
+
+        /* addClasses = menu.findItem(R.id.nav_add_classes);
+
+        addClasses.setChecked(true); */
+
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_add_classes) {
+            // Handle the camera action
+        } else if (id == R.id.nav_show_classes) {
+            changeActivity();
+        } else if (id == R.id.nav_users) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+
+    private TreeSet<Integer> allSemesters = new TreeSet<>();
+
+    private int workloadHours = 0;
+    private String grade = "EXC";
+
+    // Constants
+    private static final int MAX_SEMESTER = 16;
 
     // Methods related to the spinner
 
@@ -61,11 +132,11 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
 
     public void onItemSelected(AdapterView<?> parent, View view,
                                int pos, long id) {
-        // An item was selected. You can retrieve the selected item using
-        // parent.getItemAtPosition(pos)
-        String item = parent.getItemAtPosition(pos).toString();
-
-        grade = item;
+        /*
+        An item was selected. You can retrieve the selected item using
+        parent.getItemAtPosition(pos)
+        */
+        grade = parent.getItemAtPosition(pos).toString();
     }
 
     public void onNothingSelected(AdapterView<?> parent) {
@@ -80,7 +151,7 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         String nameOfClass = getNameOfClass();
 
         // Check to see if the name inputted is a valid name
-        if (nameOfClass != "")
+        if (! nameOfClass.equals(""))
         {
             // Check to see if the class isn't already registered
             if (!classesDB.isClassRegistered(nameOfClass))
@@ -96,10 +167,6 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
                         double nota = gradeToNota(grade);
 
                         classesDB.addClass(nameOfClass, semester, workloadHours, nota);
-
-                        totalWorkload += workloadHours;
-
-                        totalPoints += (nota * workloadHours);
 
                         makeToast(nameOfClass + " succesfully added!");
 
@@ -227,15 +294,12 @@ public class AddClasses extends AppCompatActivity implements AdapterView.OnItemS
         }
     }
 
-    public void changeActivity(View view)
+    private void changeActivity()
     {
         Intent intent = new Intent(this, ShowClasses.class);
-        
-        intent.putExtra("CDR", totalPoints/totalWorkload);
 
         intent.putExtra("Semesters", allSemesters);
 
         startActivity(intent);
     }
 }
-
