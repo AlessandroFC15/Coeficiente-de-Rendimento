@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class ClassesData extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "ClassesData";
+    public static final String DATABASE_NAME = "ClassesData";
     private static final int DATABASE_VERSION = 1;
 
     private static final String TEXT_TYPE = " TEXT";
@@ -75,12 +75,6 @@ public class ClassesData extends SQLiteOpenHelper {
         db.execSQL(DELETE_CLASSES_TABLE);
         db.execSQL(DELETE_USERS_TABLE);
         onCreate(db);
-    }
-
-    public void deleleAllTables()
-    {
-        deleteClassesTable();
-        deleteUsersTable();
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -199,6 +193,29 @@ public class ClassesData extends SQLiteOpenHelper {
         ArrayList<String> allNameOfClasses = getAllNamesOfClasses();
 
         return allNameOfClasses.indexOf(nameOfClass) != -1;
+    }
+
+    public void addUser(String name)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_NAME, name);
+        values.put(COLUMN_WORKLOAD, 0);
+        values.put(COLUMN_POINTS, 0);
+
+        // Insert the new row, returning the primary key value of the new row
+        db.insert(TABLE_NAME_USERS, "null", values);
+    }
+
+    public Cursor getAllUsersData()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME_USERS, null);
+
+        return c;
     }
 }
 
