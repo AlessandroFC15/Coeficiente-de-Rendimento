@@ -45,8 +45,11 @@ public class AddClass extends AppCompatActivity
 
         setSpinner();
 
+        // this.deleteDatabase(ClassesData.DATABASE_NAME);
+
         // Initiate database
         classesDB = new ClassesData(this);
+
     }
 
     @Override
@@ -97,7 +100,7 @@ public class AddClass extends AppCompatActivity
         } else if (id == R.id.nav_show_classes) {
             changeActivity();
         } else if (id == R.id.nav_users) {
-
+            startActivity(new Intent(this, Users.class));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
