@@ -1,20 +1,28 @@
 package com.example.android.cdr;
 
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 public class Users extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private ClassesData classesDB = new ClassesData(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,5 +105,82 @@ public class Users extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void addUser(View view)
+    {
+        String user = getNameOfUser();
+
+        if (! user.equals(""))
+        {
+            classesDB.addUser(user);
+            makeToast("User successfully added");
+
+            printAllUsers();
+        } else
+        {
+            makeToast("Invalid name");
+        }
+    }
+
+    private void printAllUsers()
+    {
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.registeredUsers);
+
+        Cursor cursor = classesDB.getAllUsersData();
+
+        String[] columns = cursor.getColumnNames();
+
+        for (String c : columns)
+        {
+            makeToast(c);
+        }
+
+        try {
+            while (cursor.moveToNext()) {
+                String nameOfUser =
+                        cursor.getString(cursor.getColumnIndex(ClassesData.COLUMN_NAME));
+
+                int id = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_ID));
+
+                printUser(nameOfUser, id, mainLayout);
+            }
+        } finally {
+            cursor.close();
+        }
+    }
+
+    private void printUser(String name, int id, LinearLayout layout)
+    {
+        TextView user = new TextView(this);
+
+        user.setText(Integer.toString(id) + name);
+        user.setTextSize(16);
+
+        layout.addView(user);
+
+    }
+
+    private String getNameOfUser()
+    {
+        EditText input = (EditText) findViewById(R.id.nameOfUser);
+
+        // The function trim is used to exclude any additional whitespace.
+        String name = input.getText().toString().trim();
+
+        if (TextUtils.isEmpty(name))
+        {
+            input.setError("Text must not be empty!");
+            return "";
+        } else
+        {
+            return name;
+        }
+    }
+
+    public void makeToast(String text)
+    {
+        Toast toast = Toast.makeText(getApplicationContext(), text, Toast.LENGTH_SHORT);
+        toast.show();
     }
 }
