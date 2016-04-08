@@ -1,6 +1,7 @@
 package com.example.android.cdr;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.TypedValue;
@@ -125,8 +126,20 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     private void printAllClasses() {
         TableLayout mainLayout = (TableLayout) findViewById(R.id.classesTable);
 
-        for (String nameOfClass : classesDB.getAllNamesOfClasses()) {
-            printSingleClass(nameOfClass, mainLayout);
+        Cursor cursor = classesDB.getAllClassesData();
+
+        try {
+            while (cursor.moveToNext()) {
+                String nameOfClass = cursor.getString(cursor.getColumnIndex(ClassesData.COLUMN_NAME));
+
+                int grade = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_GRADE));
+
+                int workload = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_WORKLOAD));
+
+                printSingleClass(nameOfClass, grade, workload, mainLayout);
+            }
+        } finally {
+            cursor.close();
         }
     }
 
@@ -148,7 +161,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
                 totalWorkload += workload;
 
-                printSingleClass(nameOfClass, table);
+                // printSingleClass(nameOfClass, table);
             }
         }
 
@@ -171,7 +184,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         table.addView(textView);
     }
 
-    private void printSingleClass(String name, TableLayout table) {
+    private void printSingleClass(String name, int grade, int workload, TableLayout table) {
         // Creation of the row that will hold the class
         TableRow wholeClass = new TableRow(this);
 
@@ -182,21 +195,21 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         nameOfClass.setWidth(getPixels(160));
 
         // Add of grade cell
-        TextView grade = new TextView(this);
-        grade.setText(getGradeString(name));
-        grade.setTextSize(16);
-        grade.setWidth(getPixels(80));
+        TextView textGrade = new TextView(this);
+        textGrade.setText(getGradeString(grade));
+        textGrade.setTextSize(16);
+        textGrade.setWidth(getPixels(80));
 
         // Add of workload cell
-        TextView workload = new TextView(this);
-        workload.setText(Integer.toString(getWorkload(name)));
-        workload.setTextSize(16);
-        workload.setWidth(getPixels(80));
+        TextView textWorkload = new TextView(this);
+        textWorkload.setText(Integer.toString(workload));
+        textWorkload.setTextSize(16);
+        textWorkload.setWidth(getPixels(80));
 
 
         wholeClass.addView(nameOfClass);
-        wholeClass.addView(grade);
-        wholeClass.addView(workload);
+        wholeClass.addView(textGrade);
+        wholeClass.addView(textWorkload);
 
         // Adding the row to the table
         TableLayout layout = (TableLayout) findViewById(R.id.classesTable);
@@ -267,10 +280,8 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
         }
     }
 
-    private String getGradeString(String nameOfClass)
+    private String getGradeString(int grade)
     {
-        double grade = getGrade(nameOfClass);
-
         if (grade != -1)
         {
             if (grade == 10)

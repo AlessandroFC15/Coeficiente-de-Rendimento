@@ -22,6 +22,8 @@ public class ClassesData extends SQLiteOpenHelper {
 
     private static final String COMMA_SEP = ",";
 
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_USER = "user";
     public static final String COLUMN_NAME = "name_class";
     public static final String COLUMN_SEMESTER = "semester";
     public static final String COLUMN_WORKLOAD = "workload_hours";
@@ -30,9 +32,10 @@ public class ClassesData extends SQLiteOpenHelper {
 
     // Classes Table
 
-    private static final String TABLE_NAME_CLASSES = "Classes";
+    public static final String TABLE_NAME_CLASSES = "Classes";
     public static final String CREATE_CLASSES_TABLE =
             "CREATE TABLE " + TABLE_NAME_CLASSES + " (" +
+                    COLUMN_USER + INT_TYPE + COMMA_SEP +
                     COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
                     COLUMN_SEMESTER + INT_TYPE + COMMA_SEP +
                     COLUMN_WORKLOAD + INT_TYPE + COMMA_SEP +
@@ -41,17 +44,20 @@ public class ClassesData extends SQLiteOpenHelper {
     public static final String DELETE_CLASSES_TABLE =
             "DROP TABLE IF EXISTS " + TABLE_NAME_CLASSES;
 
-    // Classes Table
+    // Classes Users
 
-    private static final String TABLE_NAME_USERS = "Users";
+    public static final String TABLE_NAME_USERS = "Users";
     public static final String CREATE_USERS_TABLE =
             "CREATE TABLE " + TABLE_NAME_USERS + " (" +
+                    COLUMN_ID + INT_TYPE + " PRIMARY KEY," +
                     COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
                     COLUMN_WORKLOAD + INT_TYPE + COMMA_SEP +
                     COLUMN_POINTS + INT_TYPE + ");";
 
     public static final String DELETE_USERS_TABLE =
             "DROP TABLE IF EXISTS " + TABLE_NAME_USERS;
+
+    public int userID = 0;
 
     ClassesData(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -60,19 +66,39 @@ public class ClassesData extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(CREATE_CLASSES_TABLE);
-        // db.execSQL(CREATE_USERS_TABLE);
+        db.execSQL(CREATE_USERS_TABLE);
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
         db.execSQL(DELETE_CLASSES_TABLE);
-        // db.execSQL(DELETE_USERS_TABLE);
+        db.execSQL(DELETE_USERS_TABLE);
         onCreate(db);
+    }
+
+    public void deleleAllTables()
+    {
+        deleteClassesTable();
+        deleteUsersTable();
     }
 
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    public void deleteClassesTable()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NAME_CLASSES, null, null);
+    }
+
+    public void deleteUsersTable()
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        db.delete(TABLE_NAME_USERS, null, null);
     }
 
     public void addClass(String nameOfClass, int semester, int workload, double grade) {
@@ -123,6 +149,34 @@ public class ClassesData extends SQLiteOpenHelper {
         }
 
         return allNames;
+    }
+
+    public Cursor getAllClassesData()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] projection = {
+                COLUMN_NAME,
+                COLUMN_SEMESTER,
+                COLUMN_WORKLOAD,
+                COLUMN_GRADE
+        };
+
+        // How you want the results sorted in the resulting Cursor
+        String sortOrder =
+                COLUMN_SEMESTER + " DESC";
+
+        Cursor cursor = db.query(
+                TABLE_NAME_CLASSES,  // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                sortOrder                                 // The sort order
+        );
+
+        return cursor;
     }
 
     public boolean isClassesTableEmpty() {
