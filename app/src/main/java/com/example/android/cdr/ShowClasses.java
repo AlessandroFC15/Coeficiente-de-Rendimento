@@ -38,8 +38,6 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
 
         Intent intent = getIntent();
 
-        // classes = (HashMap) intent.getSerializableExtra("Classes");
-
         allSemesters = (TreeSet) intent.getSerializableExtra("Semesters");
 
         setSpinner();
@@ -126,7 +124,7 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     private void printAllClasses() {
         TableLayout mainLayout = (TableLayout) findViewById(R.id.classesTable);
 
-        Cursor cursor = classesDB.getAllClassesData();
+        Cursor cursor = classesDB.getClassesOfUser();
 
         try {
             while (cursor.moveToNext()) {
@@ -218,13 +216,11 @@ public class ShowClasses extends AppCompatActivity implements AdapterView.OnItem
     }
 
     private void printCdR() {
-        Intent intent = getIntent();
 
-        Double cdr = intent.getDoubleExtra("CDR", 0);
+        float cdr = classesDB.getCDR();
 
         TextView textView = new TextView(this);
 
-        // textView.setText("Coeficiente de Rendimento\n" + cdr.toString());
         textView.setText(String.format( "Coeficiente de Rendimento\n%.2f", cdr));
         textView.setTextSize(22);
         textView.setGravity(Gravity.CENTER_HORIZONTAL);

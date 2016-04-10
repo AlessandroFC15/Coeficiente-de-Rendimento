@@ -129,13 +129,6 @@ public class Users extends AppCompatActivity
 
         Cursor cursor = classesDB.getAllUsersData();
 
-        String[] columns = cursor.getColumnNames();
-
-        for (String c : columns)
-        {
-            makeToast(c);
-        }
-
         try {
             while (cursor.moveToNext()) {
                 String nameOfUser =
@@ -143,22 +136,26 @@ public class Users extends AppCompatActivity
 
                 int id = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_ID));
 
-                printUser(nameOfUser, id, mainLayout);
+                int workload = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_WORKLOAD));
+
+                int points = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_POINTS));
+
+                printUser(nameOfUser, id, workload, points, mainLayout);
             }
         } finally {
             cursor.close();
         }
     }
 
-    private void printUser(String name, int id, LinearLayout layout)
+    private void printUser(String name, int id, int workload, int points, LinearLayout layout)
     {
         TextView user = new TextView(this);
 
-        user.setText(Integer.toString(id) + name);
+        user.setText(Integer.toString(id) + name + "\t" + Integer.toString(workload)
+        + "\t" + Integer.toString(points));
         user.setTextSize(16);
 
         layout.addView(user);
-
     }
 
     private String getNameOfUser()

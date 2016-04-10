@@ -8,9 +8,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 
-/**
- * Created by Alessandro on 03/04/2016.
- */
 public class ClassesData extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "ClassesData";
@@ -23,7 +20,6 @@ public class ClassesData extends SQLiteOpenHelper {
     private static final String COMMA_SEP = ",";
 
     public static final String COLUMN_ID = "id";
-    public static final String COLUMN_USER = "user";
     public static final String COLUMN_NAME = "name_class";
     public static final String COLUMN_SEMESTER = "semester";
     public static final String COLUMN_WORKLOAD = "workload_hours";
@@ -35,7 +31,7 @@ public class ClassesData extends SQLiteOpenHelper {
     public static final String TABLE_NAME_CLASSES = "Classes";
     public static final String CREATE_CLASSES_TABLE =
             "CREATE TABLE " + TABLE_NAME_CLASSES + " (" +
-                    COLUMN_USER + INT_TYPE + COMMA_SEP +
+                    COLUMN_ID + INT_TYPE + COMMA_SEP +
                     COLUMN_NAME + TEXT_TYPE + COMMA_SEP +
                     COLUMN_SEMESTER + INT_TYPE + COMMA_SEP +
                     COLUMN_WORKLOAD + INT_TYPE + COMMA_SEP +
@@ -44,7 +40,7 @@ public class ClassesData extends SQLiteOpenHelper {
     public static final String DELETE_CLASSES_TABLE =
             "DROP TABLE IF EXISTS " + TABLE_NAME_CLASSES;
 
-    // Classes Users
+    // Users Table
 
     public static final String TABLE_NAME_USERS = "Users";
     public static final String CREATE_USERS_TABLE =
@@ -57,7 +53,7 @@ public class ClassesData extends SQLiteOpenHelper {
     public static final String DELETE_USERS_TABLE =
             "DROP TABLE IF EXISTS " + TABLE_NAME_USERS;
 
-    public int userID = 0;
+    public int userID = 1;
 
     ClassesData(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -100,13 +96,67 @@ public class ClassesData extends SQLiteOpenHelper {
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
+        values.put(COLUMN_ID, userID);
         values.put(COLUMN_NAME, nameOfClass);
         values.put(COLUMN_SEMESTER, semester);
         values.put(COLUMN_WORKLOAD, workload);
         values.put(COLUMN_GRADE, grade);
 
+        addClassToUsersTable((int) (workload * grade), workload);
+
         // Insert the new row, returning the primary key value of the new row
         db.insert(TABLE_NAME_CLASSES, "null", values);
+    }
+
+    private void addClassToUsersTable(int points, int workload)
+    {
+        // 1st Step = Get the old values
+        SQLiteDatabase db = this.getReadableDatabase();
+        int totalPoints = 0;
+        float totalWorkload = 0;
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                COLUMN_WORKLOAD,
+                COLUMN_POINTS
+        };
+
+        String selection = COLUMN_ID + " LIKE ?";
+
+        String selectionArgs[] = {Integer.toString(userID)};
+
+        Cursor c = db.query(
+                TABLE_NAME_USERS,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                // The sort order
+        );
+
+        try {
+            while (c.moveToNext()) {
+                totalWorkload = c.getInt(c.getColumnIndex(COLUMN_WORKLOAD));
+
+                totalPoints = c.getInt(c.getColumnIndex(COLUMN_POINTS));
+            }
+        } finally {
+            c.close();
+        }
+
+        // 2nd Step | Update the values
+
+        // New value for one column
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_WORKLOAD, totalWorkload + workload);
+        values.put(COLUMN_POINTS, totalPoints + points);
+
+        db.update(TABLE_NAME_USERS,
+                values,
+                selection,
+                selectionArgs);
     }
 
     public ArrayList<String> getAllNamesOfClasses() {
@@ -145,7 +195,45 @@ public class ClassesData extends SQLiteOpenHelper {
         return allNames;
     }
 
-    public Cursor getAllClassesData()
+    public float getCDR()
+    {
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String[] projection = {
+                COLUMN_WORKLOAD,
+                COLUMN_POINTS
+        };
+
+        String selection = COLUMN_ID + " = ?";
+
+        String selectionArgs[] = {Integer.toString(userID)};
+
+        Cursor cursor = db.query(
+                TABLE_NAME_USERS,  // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                            // The sort order
+        );
+
+        int points = 1 , workload = 1;
+
+        try {
+            while (cursor.moveToNext()) {
+                points = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_POINTS));
+
+                workload = cursor.getInt(cursor.getColumnIndex(ClassesData.COLUMN_WORKLOAD));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        return (float) points / workload;
+    }
+
+    public Cursor getClassesOfUser()
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -160,17 +248,19 @@ public class ClassesData extends SQLiteOpenHelper {
         String sortOrder =
                 COLUMN_SEMESTER + " DESC";
 
-        Cursor cursor = db.query(
+        String selection = COLUMN_ID + " LIKE ?";
+
+        String selectionArgs[] = {Integer.toString(userID)};
+
+        return db.query(
                 TABLE_NAME_CLASSES,  // The table to query
                 projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,                                     // don't filter by row groups
                 sortOrder                                 // The sort order
         );
-
-        return cursor;
     }
 
     public boolean isClassesTableEmpty() {
@@ -213,9 +303,7 @@ public class ClassesData extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = this.getReadableDatabase();
 
-        Cursor c = db.rawQuery("SELECT * FROM " + TABLE_NAME_USERS, null);
-
-        return c;
+        return db.rawQuery("SELECT * FROM " + TABLE_NAME_USERS, null);
     }
 }
 
